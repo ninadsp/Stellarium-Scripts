@@ -126,9 +126,9 @@ var ssh = ssh || function() {
 		}
 	},
 	// Display text on screen
-	commentary: function() {parameters},
+	commentary: function(parameters) {},
 	// Wrapper over LabelMgr.labelObject
-	labelObject: function() {parameters},
+	labelObject: function(parameters) {},
 	// wait till timestamp
 	waitTill: function(timestamp) {},
 	// merge two arrays

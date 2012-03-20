@@ -58,7 +58,7 @@ var ssh = ssh || function() {
 			color: "#aaaaaa",
 			// Supported values: N, S, E, W, NE, NW, SE, SW
 			side: "W",
-			dist: "20"
+			labelDist: "20"
 		},
 		commentary: {
 			x: 200,
@@ -84,12 +84,19 @@ var ssh = ssh || function() {
 
 		// Delete all previous labels
 		LabelMgr.deleteAllLabels();
+		var ssh.labelList = new Array();
 
 		// Clear the environment, set location and time, and other properties
 
 		core.clear(ssh.config.state);
 		core.setProjectionMode(ssh.config.projectionMode);
-		core.setObserverLocation(ssh.config.lat, ssh.config.lon, ssh.config.alt,1,"",ssh.config.planet);
+		core.setObserverLocation(ssh.config.lat, 
+					ssh.config.lon, 
+					ssh.config.alt,
+					1,
+					"",
+					ssh.config.planet
+				);
 		core.setDate(ssh.config.time, ssh.config.timespec);
 		StelSkyDrawer.setBortleScale(ssh.config.bortleScale);
 		LandscapeMgr.setFlagCardinalsPoints(ssh.config.cardinalPoints);
@@ -126,11 +133,99 @@ var ssh = ssh || function() {
 		}
 	},
 	// Display text on screen
-	commentary: function(parameters) {},
+	commentary: function(textArray, parameters) {
+
+		var options = merge(ssh.config.commentary, parameters);
+		var lineSep = options.size * 1.5;
+		var y = options.y;
+		var ids = new Array();
+
+		// Create labels
+		for(var i = 0; i < textArray.length; i++) {
+			ids[i] = LabelMgr.labelScreen( textArray[i],
+							options.x,
+							y,
+							options.visible,
+							options.size,
+							options.color
+						);
+			// do we really need to push them to the global list?
+			//ssh.labelList.push(ids[i]);
+			y += lineSep;
+		}
+
+		// Wait for display time
+		core.wait(options.time);
+
+		// delete all labels
+		for(var i = 0; i < ids.length; i++) {
+			LabelMgr.deleteLabel(ids[i]);
+		}
+	},
 	// Wrapper over LabelMgr.labelObject
-	labelObject: function(parameters) {},
-	// wait till timestamp
-	waitTill: function(timestamp) {},
+	labelObject: function(obj, parameters) {
+		var options = merge(ssh.config.labels, parameters);
+
+		var currLabel = LabelMgr.labelObject(obj.engName, 
+							obj.id, 
+							options.visible, 
+							options.size,
+							options.color,
+							options.side,
+							options.labelDist
+						);
+		
+		if(currLabel != -1)	{
+			ssh.labelList.push(currLabel);
+		}
+		return currLabel;
+
+	},
+	// wait till timestamp (assumes that timestamp is greater than
+	// current time stamp. Cannot yet handle running time backwards)
+	// TODO: Handle a timestamp in history
+	waitTill: function(timestamp, timespec = ssh.config.timespec, timeRate = "1") {
+		var now = core.getJDay();
+		var currTimeRate = core.getTimeRate();
+		var then = core.jdFromDateString(timestamp, timespec);
+		var diff = then - now;
+
+		if(diff > 0) {
+
+			// Speed up if required
+			// We should handle this more gracefully,
+			// the way the solar eclipse script handles
+			// it. TODO
+			if(currTimeRate != timeRate) {
+				core.setTimeRate(timeRate);
+			}
+
+			// mindlessly loop till we reach timestamp
+			do{
+				core.wait(1);
+				diff = then - core.getJDay();
+			}
+			while( diff > 0 );
+
+			// reset time rate if we had changed it
+			if(currTimeRate != timeRate) {
+				core.setTimeRate(currTimeRate);
+			}
+		}
+	},
+	// Show/Hide Constellation lines and art
+	displayConstelLinesArt: function(flag){
+		if(flag) {
+			ConstellationMgr.setFlagLines(true);
+			core.wait(3);
+			ConstellationMgr.setFlagArt(true);
+		}
+		else	{
+			ConstellationMgr.setFlagArt(false);
+			core.wait(2);
+			ConstellationMgr.setFlagLines(false);
+		}
+	},
 	// merge two arrays
 	merge: function(a, b) {
 		var merged = a.clone();

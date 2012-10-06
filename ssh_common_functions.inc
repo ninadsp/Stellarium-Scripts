@@ -1,16 +1,16 @@
 //
-// Stellarium Scripts
-//
+// Name: Stellarium Scripts - Common Functions
+// License: Public Domain
+// Author: Ninad Pundalik
+// Description: A common set of functions used in Stellarium scripts
 // http://github.com/ninadsp/Stellarium-Scripts
-//
-// Common functions for scripts
 //
 
 // Stellarium Script Helper - The object which includes all
 // functions and variables
 var ssh = ssh || function() {
 	// Default settings
-	defaults: {
+	var defaults = {
 		// core.clear - Supported values: natural, starchart, deepspace
 		state: "natural",
 		// core.setProjectionMode - Supported values: ProjectionPerspective,
@@ -41,7 +41,7 @@ var ssh = ssh || function() {
 		// Display constellation lines
 		constellationLines: false,
 		// Display constellation art
-		constellationArt: false
+		constellationArt: false,
 		// Amount of object information to be displayed. Supported values:
 		// None, ShortIntro, AllInfo
 		selectedObjectInfo: "ShortIntro",
@@ -76,15 +76,15 @@ var ssh = ssh || function() {
 	// Initialize the night sky according to defaults and 
 	// values passed by the user
 	// lat, lon, alt, timestamp
-	initEnv: function(parameters) {
+	var initEnv = function(parameters) {
 
 		// Merge defaults and parameters passed by user
 		// and store in ssh.config
-		ssh.config = merge(defaults, parameters);
+		ssh.config = ssh.merge(defaults, parameters);
 
 		// Delete all previous labels
 		LabelMgr.deleteAllLabels();
-		var ssh.labelList = new Array();
+		ssh.labelList = new Array();
 
 		// Clear the environment, set location and time, and other properties
 
@@ -122,7 +122,7 @@ var ssh = ssh || function() {
 		core.wait(1);
 	},
 	// Point out a series of objects in the sky
-	pointObjects: function(objectArray, wait) {
+	var pointObjects = function(objectArray, wait) {
 		if(isNaN(wait)) {
 			wait = ssh.config.pointerWait;
 		}
@@ -133,7 +133,7 @@ var ssh = ssh || function() {
 		}
 	},
 	// Display text on screen
-	commentary: function(textArray, parameters) {
+	var commentary = function(textArray, parameters) {
 
 		var options = merge(ssh.config.commentary, parameters);
 		var lineSep = options.size * 1.5;
@@ -163,7 +163,7 @@ var ssh = ssh || function() {
 		}
 	},
 	// Wrapper over LabelMgr.labelObject
-	labelObject: function(obj, parameters) {
+	var labelObject = function(obj, parameters) {
 		var options = merge(ssh.config.labels, parameters);
 
 		var currLabel = LabelMgr.labelObject(obj.engName, 
@@ -184,7 +184,13 @@ var ssh = ssh || function() {
 	// wait till timestamp (assumes that timestamp is greater than
 	// current time stamp. Cannot yet handle running time backwards)
 	// TODO: Handle a timestamp in history
-	waitTill: function(timestamp, timespec = ssh.config.timespec, timeRate = "1") {
+	var waitTill = function(timestamp, timespec, timeRate) {
+		if(typeof(timespec) === undefined) {
+			timespec = ssh.config.timespec;
+		}
+		if(isNan(timeRate)) {
+			timeRate = 1;
+		}
 		var now = core.getJDay();
 		var currTimeRate = core.getTimeRate();
 		var then = core.jdFromDateString(timestamp, timespec);
@@ -214,7 +220,7 @@ var ssh = ssh || function() {
 		}
 	},
 	// Show/Hide Constellation lines and art
-	displayConstelLinesArt: function(flag){
+	var displayConstelLinesArt = function(flag){
 		if(flag) {
 			ConstellationMgr.setFlagLines(true);
 			core.wait(3);
@@ -227,7 +233,7 @@ var ssh = ssh || function() {
 		}
 	},
 	// merge two arrays
-	merge: function(a, b) {
+	var merge = function(a, b) {
 		var merged = a.clone();
 		for(var property in b) {
 			if( b.hasOwnProperty(property) ) {
@@ -237,7 +243,7 @@ var ssh = ssh || function() {
 		return merged;
 	},
 	// debug
-	debug: function(string) {
+	var debug = function(string) {
 		if(ssh.debug) {
 			core.debug(string);
 		}

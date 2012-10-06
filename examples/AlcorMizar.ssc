@@ -1,0 +1,10 @@
+//
+// Name: Alcor-Mizar
+// License: Public Domain
+// Author: Ninad Pundalik
+// Description: How to navigate to Alcor-Mizar, a beautiful
+// 		binary star in Ursa Major
+//
+
+include("../ssh_common_function.inc");
+include("../ssh_common_objects.inc");

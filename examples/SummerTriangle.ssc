@@ -1,0 +1,27 @@
+//
+// Name: Summer Triangle
+// License: Public Domain
+// Author: Ninad Pundalik
+// Description: Script to demonstrate the Summer
+//		Triangle
+//
+
+include("../ssh_common_function.inc");
+include("../ssh_common_objects.inc");
+
+params = { time: "2012-05-11T01:00:00", bortleScale: "5"};
+
+ssh.initEnv(params);
+
+ssh.commentary("Summer Triangle");
+
+core.moveToAltAzi(30,90,3);
+core.wait(3);
+StelMovementMgr.zoomTo(100,1);
+core.wait(1.5);
+
+ConstellationMgr.setFlagIsolateSelected(true);
+
+ssh.pointObjects(ssh.objects.others.summerTriangle);
+
+ConstellationMgr.setFlagLines(true);

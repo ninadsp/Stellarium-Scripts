@@ -1,0 +1,27 @@
+//
+// Name: Winter Triangle
+// License: Public Domain
+// Author: Ninad Pundalik
+// Description: Script to demonstrate the Winter
+//		Triangle
+//
+
+include("../ssh_common_function.inc");
+include("../ssh_common_objects.inc");
+
+params = { time: "2012-02-11T21:00:00" };
+
+ssh.initEnv(params);
+
+ssh.commentary("Winter Triangle");
+
+core.moveToAltAzi(75,180,3);
+core.wait(3);
+StelMovementMgr.zoomTo(60,1);
+core.wait(1.5);
+
+ConstellationMgr.setFlagIsolateSelected(true);
+
+ssh.pointObjects(ssh.objects.others.winterTriangle);
+
+ConstellationMgr.setFlagLines(true);
